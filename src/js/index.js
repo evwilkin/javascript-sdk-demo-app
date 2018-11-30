@@ -2,10 +2,11 @@
 // Copyright 2018 Optimizely. Licensed under the Apache License
 
 import OptimizelyManager from './optimizely_manager';
+import { getCookie } from './audience';
 
 const _ = require('underscore');
 
-async function main() {
+async function main () {
   const optimizelyClientInstance = await OptimizelyManager.createInstance();
 
   $(document).ready(function () {
@@ -24,19 +25,28 @@ async function main() {
     });
   });
 
-  function shop(userID) {
+  function shop (userID) {
+    // Retrieve cookie value & browser type
+    let bbCookie = getCookie('bbCookie');
+    let browser_type = window.WURFL.complete_device_name;
+
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
       'sorting_enabled',
       userID,
+      {
+        bbCookie,
+        browser_type
+      }
     );
-    
+
+    console.log(bbCookie, browser_type);
     // display feature if enabled
     if (isSortingEnabled) {
       _renderSortingDropdown();
     } else {
     // ensure feature is disabled
-      $('#sorting').remove();
+      $('#sorting > span').remove();
     }
 
     // update UI to display if Feature Flag is enabled
@@ -50,7 +60,7 @@ async function main() {
       'welcome_message',
       userID,
     );
-    if (welcomeMessage) {
+    if (isSortingEnabled && welcomeMessage) {
       $('#welcome').html(welcomeMessage);
     } else {
      // Set a default message
