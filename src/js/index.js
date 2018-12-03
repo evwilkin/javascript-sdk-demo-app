@@ -30,13 +30,13 @@ async function main() {
       'sorting_enabled',
       userID,
     );
-    
+
     // display feature if enabled
     if (isSortingEnabled) {
       _renderSortingDropdown();
     } else {
     // ensure feature is disabled
-      $('#sorting').remove();
+      $('#sorting > span').remove();
     }
 
     // update UI to display if Feature Flag is enabled
