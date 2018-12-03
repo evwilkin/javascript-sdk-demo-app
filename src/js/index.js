@@ -27,8 +27,9 @@ async function main () {
 
   function shop (userID) {
     // Retrieve cookie value & browser type
-    let bbCookie = getCookie('bbCookie');
-    let browser_type = window.WURFL.complete_device_name;
+    // let bbCookie = getCookie('bbCookie');
+    let bbCookie = 'brooksbell';
+    let browserType = window.WURFL.complete_device_name;
 
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
@@ -36,7 +37,7 @@ async function main () {
       userID,
       {
         bbCookie,
-        browser_type
+        browser_type: browserType
       }
     );
 
