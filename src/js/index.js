@@ -1,5 +1,6 @@
 // JavaScript SDK Demo App
 // Copyright 2018 Optimizely. Licensed under the Apache License
+/* globals $ */
 
 import OptimizelyManager from './optimizely_manager';
 import { getCookie } from './audience';
@@ -8,6 +9,7 @@ const _ = require('underscore');
 
 async function main () {
   const optimizelyClientInstance = await OptimizelyManager.createInstance();
+  window.optimizelyClientInstance = optimizelyClientInstance;
 
   $(document).ready(function () {
     _buildItems()
@@ -26,24 +28,34 @@ async function main () {
   });
 
   function shop (userID) {
-    // Retrieve cookie value & browser type
-    // let bbCookie = getCookie('bbCookie');
-    let bbCookie = 'brooksbell';
+    // Retrieve cookie value & browser type & store as attributes
+    let bbCookie = 'evan';
+    // let bbCookie = 'brooksbell';
     let browserType = window.WURFL.complete_device_name;
+    console.log(bbCookie, browserType);
+    let attributes = {
+      bbCookie,
+      browser_type: browserType
+    };
+
+    let queryParam = location.search.substr(location.search.indexOf('variation'));
 
     // retrieve Feature Flag
-    const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
-      'sorting_enabled',
+    // const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
+    //   'sorting_enabled',
+    //   userID,
+    //   attributes
+    // );
+
+    let isSortingEnabled = optimizelyClientInstance.setForcedVariation(
+      'sorting_enabled_test',
       userID,
-      {
-        bbCookie,
-        browser_type: browserType
-      }
+      queryParam
     );
 
-    console.log(bbCookie, browser_type);
     // display feature if enabled
-    if (isSortingEnabled) {
+    if (optimizelyClientInstance.getForcedVariation('sorting_enabled_test',
+    userID) === 'variation_3') {
       _renderSortingDropdown();
     } else {
     // ensure feature is disabled
@@ -60,26 +72,35 @@ async function main () {
       'sorting_enabled',
       'welcome_message',
       userID,
+      attributes
     );
-    if (isSortingEnabled && welcomeMessage) {
+    if (welcomeMessage) {
       $('#welcome').html(welcomeMessage);
     } else {
-     // Set a default message
+      // Set a default message
       $('#welcome').html('Welcome to Attic & Button');
     }
   }
 
-  function buy() {
+  function buy () {
     const userID = $('#input-name').val();
-    optimizelyClientInstance.track('item_purchase', userID);
+    let bbCookie = getCookie('bbCookie');
+    let browserType = window.WURFL.complete_device_name;
+    optimizelyClientInstance.track(
+      'item_purchase',
+      userID,
+      {
+        bbCookie,
+        browser_type: browserType
+      }
+    );
     window.location.href = '/purchase.html';
   }
 
   window.buy = buy;
 }
 
-
-async function _buildItems() {
+async function _buildItems () {
   let items = [];
 
   await $.ajax({
@@ -94,16 +115,16 @@ async function _buildItems() {
           color: item[1],
           category: item[2],
           price: parseInt(item[3].slice(1)),
-          imageUrl: item[4],
+          imageUrl: item[4]
         });
       }
-    },
+    }
   });
 
   return items;
 }
 
-function _renderItemsTable(items) {
+function _renderItemsTable (items) {
   let table = document.createElement('table');
   let i = 0;
   while (typeof items[i] !== 'undefined') {
@@ -123,7 +144,7 @@ function _renderItemsTable(items) {
   return table;
 }
 
-function _renderSortingDropdown() {
+function _renderSortingDropdown () {
   const selectTitle = document.createElement('span');
   selectTitle.innerHTML += 'Sort Items By: ';
   const selectTypes = document.createElement('select');
@@ -131,7 +152,7 @@ function _renderSortingDropdown() {
   selectTypes.innerHTML += '<option disabled selected value></option>';
   selectTypes.innerHTML += '<option value="price">Price</option>';
   selectTypes.innerHTML += '<option value="category">Category</option>';
-  selectTitle.appendChild(selectTypes)
+  selectTitle.appendChild(selectTypes);
   $('#sorting').html(selectTitle);
   $('#sorting').on('change', function () {
     var sortType = $('#sorting_type option:selected').val();
