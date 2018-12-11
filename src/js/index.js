@@ -1,6 +1,6 @@
 // JavaScript SDK Demo App
 // Copyright 2018 Optimizely. Licensed under the Apache License
-/* globals $ */
+/* globals $ location */
 
 import OptimizelyManager from './optimizely_manager';
 import { getCookie } from './audience';
@@ -28,42 +28,50 @@ async function main () {
   });
 
   function shop (userID) {
+    // Step 1: Set attributes
+    // Step 2: Call setForcedVariation(), passing in variation key
+    // Step 3: Use getForcedVariation() to retrieve assigned variation key
+
     // Retrieve cookie value & browser type & store as attributes
     let bbCookie = getCookie('bbCookie');
     let browserType = window.WURFL.complete_device_name;
-    console.log(bbCookie, browserType);
+    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
+
     let attributes = {
       bbCookie,
-      browser_type: browserType
+      browser_type: browserType,
+      query_param: queryParam
     };
 
-    let queryParam = location.search.substr(location.search.indexOf('variation'));
-
     // retrieve Feature Flag
-    const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
-      'sorting_enabled',
-      userID,
-      attributes
-    );
-
-    // let isSortingEnabled = optimizelyClientInstance.setForcedVariation(
-    //   'sorting_enabled_test',
+    // const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
+    //   'sorting_enabled',
     //   userID,
-    //   queryParam
+    //   attributes
     // );
 
-    // display feature if enabled
-    if (optimizelyClientInstance.getForcedVariation('sorting_enabled_test',
-    userID) === 'variation_3') {
+    let isForcedVariantSet = optimizelyClientInstance.setForcedVariation(
+      'sorting_enabled_test',
+      userID,
+      queryParam
+    );
+
+    // Get forced variant
+    let variation = optimizelyClientInstance.getForcedVariation('sorting_enabled_test', userID);
+    // Conditionally render based on forced variant
+    if (variation === 'variation_2') {
       _renderSortingDropdown();
+      $('#sorting').prepend('<span><h3>Welcome to Variation 2<h3></span>');
+    } else if (variation === 'variation_3') {
+      _renderSortingDropdown();
+      $('#sorting').prepend('<span><h3>Welcome to Variation 3</h3></span>');
     } else {
     // ensure feature is disabled
       $('#sorting > span').remove();
     }
 
     // update UI to display if Feature Flag is enabled
-    const indicatorBool = (isSortingEnabled) ? 'ON' : 'OFF';
-    const indicatorMessage = `[Feature ${indicatorBool}] The feature "sorting_enabled" is ${indicatorBool} for user ${userID}`;
+    const indicatorMessage = `[Forced Variation ${isForcedVariantSet}] for user ${userID}`;
     $('#feature-indicator').html(indicatorMessage);
 
     // retrieve welcome message stored as a feature variable
