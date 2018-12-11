@@ -29,8 +29,7 @@ async function main () {
 
   function shop (userID) {
     // Retrieve cookie value & browser type & store as attributes
-    let bbCookie = 'evan';
-    // let bbCookie = 'brooksbell';
+    let bbCookie = getCookie('bbCookie');
     let browserType = window.WURFL.complete_device_name;
     console.log(bbCookie, browserType);
     let attributes = {
@@ -41,17 +40,17 @@ async function main () {
     let queryParam = location.search.substr(location.search.indexOf('variation'));
 
     // retrieve Feature Flag
-    // const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
-    //   'sorting_enabled',
-    //   userID,
-    //   attributes
-    // );
-
-    let isSortingEnabled = optimizelyClientInstance.setForcedVariation(
-      'sorting_enabled_test',
+    const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
+      'sorting_enabled',
       userID,
-      queryParam
+      attributes
     );
+
+    // let isSortingEnabled = optimizelyClientInstance.setForcedVariation(
+    //   'sorting_enabled_test',
+    //   userID,
+    //   queryParam
+    // );
 
     // display feature if enabled
     if (optimizelyClientInstance.getForcedVariation('sorting_enabled_test',
