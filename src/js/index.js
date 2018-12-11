@@ -1,11 +1,12 @@
 // JavaScript SDK Demo App
 // Copyright 2018 Optimizely. Licensed under the Apache License
+/* globals $ */
 
 import OptimizelyManager from './optimizely_manager';
 
 const _ = require('underscore');
 
-async function main() {
+async function main () {
   const optimizelyClientInstance = await OptimizelyManager.createInstance();
 
   $(document).ready(function () {
@@ -24,11 +25,11 @@ async function main() {
     });
   });
 
-  function shop(userID) {
+  function shop (userID) {
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
       'sorting_enabled',
-      userID,
+      userID
     );
 
     // display feature if enabled
@@ -48,17 +49,17 @@ async function main() {
     const welcomeMessage = optimizelyClientInstance.getFeatureVariableString(
       'sorting_enabled',
       'welcome_message',
-      userID,
+      userID
     );
     if (welcomeMessage) {
       $('#welcome').html(welcomeMessage);
     } else {
-     // Set a default message
+      // Set a default message
       $('#welcome').html('Welcome to Attic & Button');
     }
   }
 
-  function buy() {
+  function buy () {
     const userID = $('#input-name').val();
     optimizelyClientInstance.track('item_purchase', userID);
     window.location.href = '/purchase.html';
