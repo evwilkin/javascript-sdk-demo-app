@@ -36,12 +36,12 @@ async function main () {
     /* Set Attribute Values */
     let bbCookie = getCookie('bbCookie');
     let browserType = window.WURFL.complete_device_name;
-    let queryParam = location.search.substr(location.search.indexOf('variation'));
+    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
 
     let attributes = {
       bbCookie,
       browser_type: browserType,
-      queryParam
+      query_param: queryParam
     };
     /* End Attribute Values */
 
