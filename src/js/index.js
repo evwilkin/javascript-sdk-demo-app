@@ -1,6 +1,6 @@
 // JavaScript SDK Demo App
 // Copyright 2018 Optimizely. Licensed under the Apache License
-/* globals $ */
+/* globals $ location */
 
 import OptimizelyManager from './optimizely_manager';
 import { getCookie } from './audience';
@@ -28,16 +28,22 @@ async function main () {
   });
 
   function shop (userID) {
-    // Retrieve cookie value & browser type & store as attributes
+    // Step 1: Set Attribute Values
+    // Step 2: Pass attributes through to .isFeatureEnabled()
+    // Step 3: Pass attributes through to .getFeatureVariableString()
+    // Step 4: Pass attributes through to .track()
+
+    /* Set Attribute Values */
     let bbCookie = getCookie('bbCookie');
     let browserType = window.WURFL.complete_device_name;
-    console.log(bbCookie, browserType);
+    let queryParam = location.search.substr(location.search.indexOf('variation'));
+
     let attributes = {
       bbCookie,
-      browser_type: browserType
+      browser_type: browserType,
+      queryParam
     };
-
-    let queryParam = location.search.substr(location.search.indexOf('variation'));
+    /* End Attribute Values */
 
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
@@ -46,26 +52,6 @@ async function main () {
       attributes
     );
 
-    // let isSortingEnabled = optimizelyClientInstance.setForcedVariation(
-    //   'sorting_enabled_test',
-    //   userID,
-    //   queryParam
-    // );
-
-    // display feature if enabled
-    if (optimizelyClientInstance.getForcedVariation('sorting_enabled_test',
-    userID) === 'variation_3') {
-      _renderSortingDropdown();
-    } else {
-    // ensure feature is disabled
-      $('#sorting > span').remove();
-    }
-
-    // update UI to display if Feature Flag is enabled
-    const indicatorBool = (isSortingEnabled) ? 'ON' : 'OFF';
-    const indicatorMessage = `[Feature ${indicatorBool}] The feature "sorting_enabled" is ${indicatorBool} for user ${userID}`;
-    $('#feature-indicator').html(indicatorMessage);
-
     // retrieve welcome message stored as a feature variable
     const welcomeMessage = optimizelyClientInstance.getFeatureVariableString(
       'sorting_enabled',
@@ -73,12 +59,26 @@ async function main () {
       userID,
       attributes
     );
+
+    // display feature if enabled
+    if (isSortingEnabled) {
+      _renderSortingDropdown();
+    } else {
+    // ensure feature is disabled
+      $('#sorting > span').remove();
+    }
+
     if (welcomeMessage) {
       $('#welcome').html(welcomeMessage);
     } else {
       // Set a default message
       $('#welcome').html('Welcome to Attic & Button');
     }
+
+    // update UI to display if Feature Flag is enabled
+    const indicatorBool = (isSortingEnabled) ? 'ON' : 'OFF';
+    const indicatorMessage = `[Feature ${indicatorBool}] The feature "sorting_enabled" is ${indicatorBool} for user ${userID}`;
+    $('#feature-indicator').html(indicatorMessage);
   }
 
   function buy () {
