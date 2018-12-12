@@ -1,15 +1,13 @@
 // JavaScript SDK Demo App
 // Copyright 2018 Optimizely. Licensed under the Apache License
-/* globals $ location */
+/* globals $ */
 
 import OptimizelyManager from './optimizely_manager';
-import { getCookie } from './audience';
 
 const _ = require('underscore');
 
 async function main () {
   const optimizelyClientInstance = await OptimizelyManager.createInstance();
-  window.optimizelyClientInstance = optimizelyClientInstance;
 
   $(document).ready(function () {
     _buildItems()
@@ -28,36 +26,10 @@ async function main () {
   });
 
   function shop (userID) {
-    // Step 1: Set Attribute Values
-    // Step 2: Pass attributes through to .isFeatureEnabled()
-    // Step 3: Pass attributes through to .getFeatureVariableString()
-    // Step 4: Pass attributes through to .track()
-
-    /* Set Attribute Values */
-    let bbCookie = getCookie('bbCookie');
-    let browserType = window.WURFL.complete_device_name;
-    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
-
-    let attributes = {
-      bbCookie,
-      browser_type: browserType,
-      query_param: queryParam
-    };
-    /* End Attribute Values */
-
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
       'sorting_enabled',
-      userID,
-      attributes
-    );
-
-    // retrieve welcome message stored as a feature variable
-    const welcomeMessage = optimizelyClientInstance.getFeatureVariableString(
-      'sorting_enabled',
-      'welcome_message',
-      userID,
-      attributes
+      userID
     );
 
     // display feature if enabled
@@ -68,38 +40,36 @@ async function main () {
       $('#sorting > span').remove();
     }
 
+    // update UI to display if Feature Flag is enabled
+    const indicatorBool = (isSortingEnabled) ? 'ON' : 'OFF';
+    const indicatorMessage = `[Feature ${indicatorBool}] The feature "sorting_enabled" is ${indicatorBool} for user ${userID}`;
+    $('#feature-indicator').html(indicatorMessage);
+
+    // retrieve welcome message stored as a feature variable
+    const welcomeMessage = optimizelyClientInstance.getFeatureVariableString(
+      'sorting_enabled',
+      'welcome_message',
+      userID
+    );
     if (welcomeMessage) {
       $('#welcome').html(welcomeMessage);
     } else {
       // Set a default message
       $('#welcome').html('Welcome to Attic & Button');
     }
-
-    // update UI to display if Feature Flag is enabled
-    const indicatorBool = (isSortingEnabled) ? 'ON' : 'OFF';
-    const indicatorMessage = `[Feature ${indicatorBool}] The feature "sorting_enabled" is ${indicatorBool} for user ${userID}`;
-    $('#feature-indicator').html(indicatorMessage);
   }
 
   function buy () {
     const userID = $('#input-name').val();
-    let bbCookie = getCookie('bbCookie');
-    let browserType = window.WURFL.complete_device_name;
-    optimizelyClientInstance.track(
-      'item_purchase',
-      userID,
-      {
-        bbCookie,
-        browser_type: browserType
-      }
-    );
+    optimizelyClientInstance.track('item_purchase', userID);
     window.location.href = '/purchase.html';
   }
 
   window.buy = buy;
 }
 
-async function _buildItems () {
+
+async function _buildItems() {
   let items = [];
 
   await $.ajax({
@@ -114,16 +84,16 @@ async function _buildItems () {
           color: item[1],
           category: item[2],
           price: parseInt(item[3].slice(1)),
-          imageUrl: item[4]
+          imageUrl: item[4],
         });
       }
-    }
+    },
   });
 
   return items;
 }
 
-function _renderItemsTable (items) {
+function _renderItemsTable(items) {
   let table = document.createElement('table');
   let i = 0;
   while (typeof items[i] !== 'undefined') {
@@ -143,7 +113,7 @@ function _renderItemsTable (items) {
   return table;
 }
 
-function _renderSortingDropdown () {
+function _renderSortingDropdown() {
   const selectTitle = document.createElement('span');
   selectTitle.innerHTML += 'Sort Items By: ';
   const selectTypes = document.createElement('select');
@@ -151,7 +121,7 @@ function _renderSortingDropdown () {
   selectTypes.innerHTML += '<option disabled selected value></option>';
   selectTypes.innerHTML += '<option value="price">Price</option>';
   selectTypes.innerHTML += '<option value="category">Category</option>';
-  selectTitle.appendChild(selectTypes);
+  selectTitle.appendChild(selectTypes)
   $('#sorting').html(selectTitle);
   $('#sorting').on('change', function () {
     var sortType = $('#sorting_type option:selected').val();
