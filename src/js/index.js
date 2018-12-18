@@ -30,13 +30,13 @@ async function main () {
 
     // Retrieve cookie value & browser type & store as attributes
     let browserType = window.WURFL.complete_device_name;
-    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
     let bbCookie = getCookie('bbCookie');
+    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
 
     let attributes = {
       // browser_type: browserType,
-      // query_param: queryParam
       // bbCookie,
+      // query_param: queryParam
     };
 
     // retrieve Feature Flag
