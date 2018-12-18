@@ -8,6 +8,7 @@ const _ = require('underscore');
 
 async function main () {
   const optimizelyClientInstance = await OptimizelyManager.createInstance();
+  window.optimizelyClientInstance = optimizelyClientInstance;
 
   $(document).ready(function () {
     _buildItems()
