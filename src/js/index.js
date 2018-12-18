@@ -3,6 +3,7 @@
 /* globals $ */
 
 import OptimizelyManager from './optimizely_manager';
+import { getCookie } from './audience';
 
 const _ = require('underscore');
 
@@ -26,6 +27,18 @@ async function main () {
   });
 
   function shop (userID) {
+
+    // Retrieve cookie value & browser type & store as attributes
+    let browserType = window.WURFL.complete_device_name;
+    let queryParam = location.search.substr(location.search.indexOf('test=') + 5);
+    let bbCookie = getCookie('bbCookie');
+
+    let attributes = {
+      // browser_type: browserType,
+      // query_param: queryParam
+      // bbCookie,
+    };
+
     // retrieve Feature Flag
     const isSortingEnabled = optimizelyClientInstance.isFeatureEnabled(
       'sorting_enabled',

@@ -14,9 +14,9 @@ class OptimizelyManager {
     var datafile = await _getDatafile();
     return optimizely.createInstance({
       datafile: datafile,
-      logger: logger.createLogger({
-        logLevel: enums.LOG_LEVEL.DEBUG,
-      }),
+      // logger: logger.createLogger({
+      //   logLevel: enums.LOG_LEVEL.DEBUG,
+      // }),
     });
   }
 }
