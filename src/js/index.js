@@ -63,7 +63,9 @@ async function main () {
   function buy () {
     const userID = $('#input-name').val();
     optimizelyClientInstance.track('item_purchase', userID);
-    window.location.href = '/purchase.html';
+    setTimeout(() => {
+      window.location.href = '/purchase.html';
+    }, 750);
   }
 
   window.buy = buy;
